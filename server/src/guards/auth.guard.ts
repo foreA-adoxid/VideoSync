@@ -36,11 +36,6 @@ export class AuthGuard implements CanActivate {
             }
         }
 
-        const token = req.headers.authorization.split(' ')[1]
-        if (token === this.configService.getOrThrow('HTTP_AUTH_TOKEN')) {
-            return true
-        }
-
         const user = await this.authService.getUserFromRequest(req)
         if (!user) {
             throw new HttpException('Invalid user', HttpStatus.UNAUTHORIZED)

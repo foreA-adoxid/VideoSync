@@ -7,8 +7,8 @@ import {
     Res,
     UploadedFile,
     UseInterceptors,
-    BadRequestException,
-} from '@nestjs/common'
+    BadRequestException, UseGuards,
+} from '@nestjs/common';
 import { VideosService } from './videos.service'
 import { Response } from 'express'
 import * as fs from 'fs'
@@ -16,6 +16,9 @@ import { Video } from '../../entities/video/Video.entity'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
 import { extname } from 'path'
+import { AuthGuard } from '../../guards/auth.guard';
+import { User as usr } from '../users/user.paramdecorator'
+import { User } from '../../entities/user/User.entity';
 
 @Controller('videos')
 export class VideosController {
@@ -23,7 +26,7 @@ export class VideosController {
 
     @Get()
     async getAllVideos(): Promise<Video[]> {
-        return this.videosService.getAllVideos()
+        return await this.videosService.getAllVideos()
     }
 
     @Get(':id/stream')
@@ -56,6 +59,7 @@ export class VideosController {
                     'video/avi',
                     'video/webm',
                 ]
+                console.log(file)
                 if (!allowedMimeTypes.includes(file.mimetype)) {
                     return callback(
                         new BadRequestException('Only video files are allowed'),
@@ -66,8 +70,9 @@ export class VideosController {
             },
         }),
     )
+    @UseGuards(AuthGuard)
     async uploadVideo(
-        @Body('userId') userId: string,
+        @usr() user: User,
         @Body('title') title: string,
         @Body('description') description: string,
         @UploadedFile() file: Express.Multer.File,
@@ -77,7 +82,7 @@ export class VideosController {
         }
 
         return this.videosService.uploadVideo(
-            userId,
+            user.id,
             title,
             description,
             file.buffer,

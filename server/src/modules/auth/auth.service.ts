@@ -9,11 +9,12 @@ import Session from './session'
 import { v4 as uuidv4 } from 'uuid'
 import { Request } from 'express'
 import { sign, verify, JwtPayload } from 'jsonwebtoken'
-import { UsersService } from '../users/users.service'
 import { ConfigService } from '@nestjs/config'
 import getUserIP from '../../utils/getUserIP'
 import { RedisService } from '@liaoliaots/nestjs-redis'
 import { aes, md5 } from '../../utils/crypto.util'
+import HttpException from '../../exteptions/HttpException'
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -31,8 +32,9 @@ export class AuthService {
     async createSession(userId: string, req: Request): Promise<string> {
         const user = await this.userService.findUserById(userId)
         if (!user) {
-            throw new Error('User not found')
+            throw new HttpException(400, 'User not found')
         }
+
         const expiresAt = Date.now() + 1209600 * 1000
 
         if (user.sessions.length >= this.MAX_SESSIONS) {
@@ -57,6 +59,7 @@ export class AuthService {
             'EX',
             1209600,
         )
+
         user.sessions.push(session.uuid)
         await user.save()
 
@@ -91,12 +94,12 @@ export class AuthService {
         if (!user) return
         user.sessions = user.sessions.filter((id) => id !== uuid)
 
-        await this.redis.del(uuid)
+        await this.redis.del(`videosync-${uuid}`)
         await user.save()
     }
 
     async fetchSession(uuid: string): Promise<Session | null> {
-        const sessionData = await this.redis.get(uuid)
+        const sessionData = await this.redis.get(`videosync-${uuid}`)
         return sessionData ? JSON.parse(sessionData) : null
     }
 
@@ -149,6 +152,11 @@ export class AuthService {
 
     async getUserFromRequest(req: Request) {
         const token = req.headers.authorization?.split(' ')[1]
+        const session = token ? await this.validateSessionByToken(token) : null
+        return session ? await this.userService.findUserById(session.userId) : null
+    }
+
+    async getUserFromSession(token: string) {
         const session = token ? await this.validateSessionByToken(token) : null
         return session ? await this.userService.findUserById(session.userId) : null
     }
