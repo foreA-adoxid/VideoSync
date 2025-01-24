@@ -57,7 +57,6 @@ export class VideosController {
                     'video/mp4',
                     'video/mkv',
                     'video/avi',
-                    'video/webm',
                 ]
                 console.log(file)
                 if (!allowedMimeTypes.includes(file.mimetype)) {

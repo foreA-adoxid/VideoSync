@@ -36,8 +36,7 @@ export class VideosService {
         if (!user) {
             throw new BadRequestException('User not found')
         }
-
-        const hash = this.computeBufferHash(buffer)
+        const hash = await this.computeBufferHash(buffer)
 
         const existingVideo = await this.videoRepository.findOne({ where: { hash } })
         if (existingVideo) {
@@ -58,8 +57,8 @@ export class VideosService {
         return this.videoRepository.save(newVideo)
     }
 
-    private computeBufferHash(buffer: Buffer): string {
-        return md5.hashFile(buffer)
+    private async computeBufferHash(buffer: Buffer): Promise<string> {
+        return await md5.hashFile(buffer)
     }
 
     private saveFile(buffer: Buffer, hash: string, extension: string): string {

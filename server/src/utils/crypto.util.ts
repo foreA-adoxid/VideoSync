@@ -1,5 +1,7 @@
 import { AES, enc, HmacMD5, lib, MD5, mode, pad } from 'crypto-js'
 import * as dotenv from 'dotenv'
+import { createHash } from 'node:crypto'
+import * as stream from 'node:stream';
 
 dotenv.config()
 
@@ -61,8 +63,17 @@ export class md5 {
         return HmacMD5(key, process.env.SECRET_TOKEN).toString()
     }
 
-    static hashFile(key: Buffer) {
-        return MD5(key.toString()).toString()
+    static hashFile(key: Buffer) : Promise<string>{
+        const hash = createHash('md5');
+
+        const readable = new stream.PassThrough();
+        readable.end(key);
+
+        return new Promise((resolve, reject) => {
+            readable.on('data', (chunk) => hash.update(chunk));
+            readable.on('end', () => resolve(hash.digest('hex')));
+            readable.on('error', (err) => reject(err));
+        });
     }
 
     static verify(password: string, hash: string) {

@@ -1,21 +1,152 @@
 ﻿<Window x:Class="client.Views.UploadVideoWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Загрузка видео" Height="400" Width="400" Background="#1E1E2F" Foreground="White">
-    <Grid>
-        <StackPanel Margin="10">
-            <TextBlock Text="Загрузка видео" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        Title="Загрузка видео"
+        Height="400"
+        Width="400"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#1E1E2F"
+        Foreground="White">
 
-            <TextBlock Text="Название видео" Margin="0,0,0,5"/>
-            <TextBox Name="TitleBox" Background="#29293D" BorderThickness="0" Margin="0,0,0,10"/>
+    <Window.Resources>
+        <Style x:Key="CloseButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2F2F3F"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#AB2222"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#BB0000"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-            <TextBlock Text="Описание видео" Margin="0,0,0,5"/>
-            <TextBox Name="DescriptionBox" Background="#29293D" BorderThickness="0" Margin="0,0,0,10"/>
 
-            <Button Content="Выбрать файл" Click="SelectFileButton_Click" Background="#2196F3" Foreground="White" Width="150" HorizontalAlignment="Center" Margin="0,0,0,20"/>
-            <TextBlock Name="FilePathText" Text="Файл не выбран" Foreground="Gray" HorizontalAlignment="Center"/>
+        <Style x:Key="GreenButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="12" SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2196F3"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#1E88E5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style x:Key="DarkTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="#29293D"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Margin" Value="0,0,0,10"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
 
-            <Button Content="Загрузить видео" Click="UploadButton_Click" Background="#4CAF50" Foreground="White" Width="150" HorizontalAlignment="Center" Margin="20,0,0,0"/>
-        </StackPanel>
+    </Window.Resources>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="RootGrid"
+                                     Storyboard.TargetProperty="Opacity"
+                                     From="0" To="1"
+                                     Duration="0:0:0.4"/>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+    <Grid x:Name="RootGrid" Opacity="0" Cursor="">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Background="#2F2F3F">
+            <TextBlock Text="Загрузка видео"
+                       DockPanel.Dock="Left"
+                       VerticalAlignment="Center"
+                       Margin="10,0"
+                       FontSize="16"
+                       FontWeight="Bold"/>
+
+            <Button Content="X"
+                    DockPanel.Dock="Right"
+                    Cursor="Hand"
+                    Style="{StaticResource CloseButtonStyle}"
+                    Click="CloseButton_Click" HorizontalAlignment="Right"/>
+        </DockPanel>
+
+        <Border Grid.Row="1" CornerRadius="12" Background="#1E1E2F" Padding="20">
+            <StackPanel>
+                <TextBlock Text="Название видео" Margin="0,0,0,5"/>
+                <TextBox x:Name="TitleBox" Style="{StaticResource DarkTextBoxStyle}"/>
+
+                <TextBlock Text="Описание видео" Margin="0,10,0,5"/>
+                <TextBox x:Name="DescriptionBox" Style="{StaticResource DarkTextBoxStyle}"/>
+
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,20">
+                    <Button x:Name="SelectButton"
+                         Content="Выбрать файл"
+                         Click="SelectFileButton_Click"
+                         Width="150"
+                         Height="40"
+                         Background="#FFE00F0F"
+                         Margin="5"
+                         Style="{StaticResource GreenButtonStyle}"
+                         Cursor="Hand"
+                    />
+                </StackPanel>
+
+                <TextBlock x:Name="FilePathText" 
+                           Text="Файл не выбран"
+                           Foreground="Gray"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+
+                <Button x:Name="UploadButton"
+                    Content="Загрузить видео"
+                    Click="UploadButton_Click"
+                    Width="150"
+                    Height="40"
+                    Background="#FF0F55E0"
+                    Margin="5"
+                    Style="{StaticResource GreenButtonStyle}"
+                    Cursor="Hand"
+                />
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

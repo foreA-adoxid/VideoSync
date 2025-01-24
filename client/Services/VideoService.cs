@@ -57,7 +57,6 @@ namespace client.Services
                 ".mp4" => "video/mp4",
                 ".mkv" => "video/x-matroska",
                 ".avi" => "video/x-msvideo",
-                ".webm" => "video/webm",
                 _ => "application/octet-stream",
             };
         }

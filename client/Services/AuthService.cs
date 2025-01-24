@@ -44,5 +44,20 @@ namespace client.Services
 
             throw new System.Exception("Registration failed");
         }
+        public async Task<User> GetProfileAsync(string token)
+        {
+            var client = new RestClient(ApiUrl);
+            var request = new RestRequest("/users/profile/me", Method.Get);
+
+            request.AddHeader("Authorization", "Bearer " + token);
+
+            var response = await client.ExecuteAsync(request);
+            if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+            {
+                return JsonConvert.DeserializeObject<User>(response.Content);
+            }
+
+            throw new System.Exception("Failed to retrieve profile");
+        }
     }
 }

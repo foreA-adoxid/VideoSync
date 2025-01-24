@@ -59,5 +59,10 @@ namespace client.Views
                 MessageBox.Show($"Ошибка загрузки видео: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
     }
 }
